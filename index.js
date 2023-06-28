@@ -40,11 +40,18 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-const bodyParser=require('body-parser')
+const bodyParser = require("body-parser");
+const User = require("./models/User");
+
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 const morgan = require("morgan");
+
+const GenerateEventData = require("./GenerateEventData");
+app.use("/generate", GenerateEventData);
+
+app.listen(3002, () => console.log("connected " + 3002));
 
 const db = require("./config/db");
 db.connect(() => {
@@ -56,8 +63,6 @@ if(process.env.NODE_ENV === 'development'){
   app.use(morgan('dev'))
 }
 */
-
-
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -609,13 +614,13 @@ app.patch("/setAccessType", (req, res) => {
       [access, event.id],
       (err, results2) => {
         if (!err) {
-          if (results2.affectedRows >0) {
+          if (results2.affectedRows > 0) {
             console.log("ACCESS_TYPE:ACCESSS TYPE RESULT");
             console.log(results2);
             console.log("\n\n");
-            res.json({changed:true})
-          }else{
-            res.json({changed:false})
+            res.json({ changed: true });
+          } else {
+            res.json({ changed: false });
           }
         }
         console.log("jdskgnksngja" + "\n\n");
@@ -623,7 +628,6 @@ app.patch("/setAccessType", (req, res) => {
 
         console.log("result");
         console.log(results2);
-        
       }
     );
   }
@@ -722,15 +726,19 @@ app.post("/getEventRequestInfo/:id", (req, res) => {
   const id = req.params.id;
 
   console.log("GETTTING EVE");
-  db.query("SELECT * FROM reservationrequests WHERE eventId = ?", id, (err, results) => {
-    console.log(results);
-    console.log("\n\n\n");
-    if(results){
-      res.json({noRequests:false,requests:results})
-    }else{
-      res.json({noRequests:true})
+  db.query(
+    "SELECT * FROM reservationrequests WHERE eventId = ?",
+    id,
+    (err, results) => {
+      console.log(results);
+      console.log("\n\n\n");
+      if (results) {
+        res.json({ noRequests: false, requests: results });
+      } else {
+        res.json({ noRequests: true });
+      }
     }
-  });
+  );
 });
 
 /**
@@ -1364,7 +1372,7 @@ const connectdb = async () => {
 
 //console.log(connectdb)
 
-const EventModel = require("./models/EventModel");
+const EventModel = require("./models/Event");
 const { Console } = require("console");
 
 app.post("/test", (req, res) => {
